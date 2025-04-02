@@ -3,19 +3,19 @@ package com.example.fluxeip;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 @SpringBootApplication
 public class FluxeipApplication {
 
-	public static void main(String[] args) {
-		
-		Dotenv dotenv = Dotenv.load();
-		String username = dotenv.get("username.email");
-        String password = dotenv.get("password");
+    public static void main(String[] args) {
+        // 直接從環境變數中讀取，而不是從 .env 檔案
+        String username = System.getenv("username.email");
+        String password = System.getenv("password");
+        
+        // 設置系統屬性（如果需要）
         System.setProperty("username", username);
         System.setProperty("password", password);
-		SpringApplication.run(FluxeipApplication.class, args);
-	}
+        
+        SpringApplication.run(FluxeipApplication.class, args);
+    }
 
 }
