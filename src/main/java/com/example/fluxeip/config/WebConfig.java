@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {
 //        registry.addMapping("/**")
-//                .allowedOrigins("http://localhost:5173")  // 允許的前端地址
+//                .allowedOrigins("https://fluxeipfrontend.onrender.com")  // 允許的前端地址
 //                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 允許的 HTTP 方法
 //                .allowedHeaders("*")  // 允許所有標頭
 //                .allowCredentials(true);  // 允許攜帶憑證（如 Cookie）

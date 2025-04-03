@@ -42,7 +42,7 @@ import com.example.fluxeip.service.EmployeeService;
 import com.example.fluxeip.service.PositionService;
 import com.example.fluxeip.service.StatusService;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://fluxeipfrontend.onrender.com")
 @RestController
 public class EmployeeController {
 	

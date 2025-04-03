@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://fluxeipfrontend.onrender.com")
 @RestController
 @RequestMapping("/api")  // 根據 API 路徑設定
 public class DepartmentCalendarController {
