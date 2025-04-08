@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -94,7 +95,7 @@ public class ApprovalFlowService {
 
 	@Autowired
 	private ExpenseRequestRepository expenseRequestRepository;
-	
+
 	@Autowired
 	private NotifyService notifyService;
 
@@ -202,9 +203,9 @@ public class ApprovalFlowService {
 
 		// 儲存簽核步驟
 		approvalStepRepository.save(approvalStep);
-		
-	    // 發送通知給第一關審核人
-		String typeName = leaveRequest.getLeaveType().getTypeName(); 
+
+		// 發送通知給第一關審核人
+		String typeName = leaveRequest.getLeaveType().getTypeName();
 		String employeeName = leaveRequest.getEmployee().getEmployeeName();
 
 		String message = "您有一筆新的請假申請待審核：員工 " + employeeName + " 的" + typeName + " 假單。";
@@ -239,11 +240,11 @@ public class ApprovalFlowService {
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 
 			leaveRequestRepository.save(leaveRequest);
-						
-			 // 通知申請人審核失敗
-	        String message = "您的請假申請《" + leaveRequest.getLeaveType().getTypeName() + "》未通過審核。";
-	        notifyService.sendNotification(leaveRequest.getEmployee().getEmployeeId(), message);		
-					
+
+			// 通知申請人審核失敗
+			String message = "您的請假申請《" + leaveRequest.getLeaveType().getTypeName() + "》未通過審核。";
+			notifyService.sendNotification(leaveRequest.getEmployee().getEmployeeId(), message);
+
 			return "已否決請假單";
 		}
 
@@ -260,10 +261,10 @@ public class ApprovalFlowService {
 			leaveRequest.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			leaveRequestRepository.save(leaveRequest);
-			
+
 			// 通知申請人審核通過
-	        String message = "您的請假申請《" + leaveRequest.getLeaveType().getTypeName() + "》已通過審核。";
-	        notifyService.sendNotification(leaveRequest.getEmployee().getEmployeeId(), message);
+			String message = "您的請假申請《" + leaveRequest.getLeaveType().getTypeName() + "》已通過審核。";
+			notifyService.sendNotification(leaveRequest.getEmployee().getEmployeeId(), message);
 
 			return "簽核成功";
 		}
@@ -307,15 +308,14 @@ public class ApprovalFlowService {
 			nextStep.setUpdatedAt(LocalDateTime.now());
 
 			approvalStepRepository.save(nextStep);
-			
+
 			// 通知下一位審核人
-			String typeName = leaveRequest.getLeaveType().getTypeName(); 
+			String typeName = leaveRequest.getLeaveType().getTypeName();
 			String employeeName = leaveRequest.getEmployee().getEmployeeName();
 
 			String message = "您有一筆新的請假申請待審核：員工 " + employeeName + " 的" + typeName + " 假單。";
 			notifyService.sendNotification(nextApprover.getEmployeeId(), message);
-			
-			
+
 		} else {
 			// 若沒有下一步，代表簽核完成，更新請假單狀態
 			Integer requestId = step.getRequestId();
@@ -324,7 +324,7 @@ public class ApprovalFlowService {
 			leaveRequest.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			leaveRequestRepository.save(leaveRequest);
-			
+
 			// 通知申請人審核通過
 			String message = "您的請假申請《" + leaveRequest.getLeaveType().getTypeName() + "》已通過審核。";
 			notifyService.sendNotification(leaveRequest.getEmployee().getEmployeeId(), message);
@@ -424,7 +424,7 @@ public class ApprovalFlowService {
 		String typeName = workAdjustmentRequest.getAdjustmentType().getTypeName(); // 例如 "加班" 或 "減班"
 		String employeeName = workAdjustmentRequest.getEmployee().getEmployeeName();
 
-		String message = "您有一筆新的"+ typeName +"申請待審核：員工" + employeeName + "的" + typeName +"單。";
+		String message = "您有一筆新的" + typeName + "申請待審核：員工" + employeeName + "的" + typeName + "單。";
 
 		notifyService.sendNotification(approver.getEmployeeId(), message);
 
@@ -458,14 +458,12 @@ public class ApprovalFlowService {
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 
 			adjustmentRequestRepository.save(request);
-			
 
-	        // 通知申請人
-	        String typeName = request.getAdjustmentType().getTypeName(); // 加班 / 減班
-	        String msg = "您的《"+ typeName +"》申請未通過審核。";
-	        notifyService.sendNotification(request.getEmployee().getEmployeeId(), msg);
-			        
-			
+			// 通知申請人
+			String typeName = request.getAdjustmentType().getTypeName(); // 加班 / 減班
+			String msg = "您的《" + typeName + "》申請未通過審核。";
+			notifyService.sendNotification(request.getEmployee().getEmployeeId(), msg);
+
 			return "已否決請假單";
 		}
 
@@ -482,13 +480,12 @@ public class ApprovalFlowService {
 			request.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			adjustmentRequestRepository.save(request);
-			
-			//通知
+
+			// 通知
 			String typeName = request.getAdjustmentType().getTypeName();
-	        String msg = "您的《"+ typeName +"》申請已通過審核。";
-	        notifyService.sendNotification(request.getEmployee().getEmployeeId(), msg);
-			
-	     
+			String msg = "您的《" + typeName + "》申請已通過審核。";
+			notifyService.sendNotification(request.getEmployee().getEmployeeId(), msg);
+
 			return "簽核成功";
 		}
 
@@ -529,14 +526,12 @@ public class ApprovalFlowService {
 			nextStep.setStatus(statusRepository.findByStatusNameAndStatusType("待審核", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			nextStep.setUpdatedAt(LocalDateTime.now());
-			
-			
-			//通知
+
+			// 通知
 			String typeName = request.getAdjustmentType().getTypeName();
-		    String employeeName = request.getEmployee().getEmployeeName();
-		    String msg ="您有一筆新的"+ typeName +"申請待審核：員工" +employeeName+"的"+ typeName +"申請單。";
-		    notifyService.sendNotification(nextApprover.getEmployeeId(), msg);
-			
+			String employeeName = request.getEmployee().getEmployeeName();
+			String msg = "您有一筆新的" + typeName + "申請待審核：員工" + employeeName + "的" + typeName + "申請單。";
+			notifyService.sendNotification(nextApprover.getEmployeeId(), msg);
 
 			approvalStepRepository.save(nextStep);
 		} else {
@@ -547,17 +542,17 @@ public class ApprovalFlowService {
 			request.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			adjustmentRequestRepository.save(request);
-			
+
 			// 通知申請人審核通過
-		    String message = "您的《" + request.getAdjustmentType().getTypeName() + "》申請已通過審核。";
-		    notifyService.sendNotification(request.getEmployee().getEmployeeId(), message);
+			String message = "您的《" + request.getAdjustmentType().getTypeName() + "》申請已通過審核。";
+			notifyService.sendNotification(request.getEmployee().getEmployeeId(), message);
 
 		}
-		
+
 		return "簽核成功";
 	}
 
-	// 查詢員工待審核的補卡單  《""》
+	// 查詢員工待審核的補卡單 《""》
 	@Transactional
 	public List<MissingPunchApprovalStepDTO> getPendingMissingPunchApprovalSteps(Integer approverId) {
 		// 查詢待審核的 ApprovalStep
@@ -642,8 +637,8 @@ public class ApprovalFlowService {
 
 		// 儲存簽核步驟
 		approvalStepRepository.save(approvalStep);
-		
-		//補卡通知
+
+		// 補卡通知
 		String employeeName = missingPunchRequest.getEmployee().getEmployeeName();
 		String clockType = missingPunchRequest.getClockType().getTypeName();
 		String date = missingPunchRequest.getMissingDate().toString();
@@ -681,11 +676,11 @@ public class ApprovalFlowService {
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 
 			missingPunchRequestRepository.save(request);
-			
+
 			// 通知失敗
 			String failMsg = "您的補卡申請《" + request.getClockType().getTypeName() + "》未通過審核。";
-		    notifyService.sendNotification(request.getEmployee().getEmployeeId(), failMsg);
-			
+			notifyService.sendNotification(request.getEmployee().getEmployeeId(), failMsg);
+
 			return "已否決請假單";
 		}
 
@@ -702,7 +697,7 @@ public class ApprovalFlowService {
 			request.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			missingPunchRequestRepository.save(request);
-					
+
 			Employee employee = request.getEmployee();
 			LocalDate missingDate = request.getMissingDate();
 
@@ -724,8 +719,9 @@ public class ApprovalFlowService {
 				log.setClockType(clockInTypeOpt.orElseThrow(() -> new RuntimeException("上班打卡類型不存在")));
 				log.setClockTime(missingDate.atTime(shiftType.getStartTime()));
 				attendanceLogsRepository.save(log);
-				Optional<AttendanceViolations> lateOpt = attendanceViolationsRepository.findByViolationType(
-						typeRepository.findByTypeName("遲到").orElseThrow(() -> new RuntimeException("遲到違規類型不存在")));
+				Optional<AttendanceViolations> lateOpt = attendanceViolationsRepository
+						.findByAttendanceAndViolationType(attendance, typeRepository.findByTypeName("遲到")
+								.orElseThrow(() -> new RuntimeException("遲到違規類型不存在")));
 				if (lateOpt.isPresent()) {
 					attendanceViolationsRepository.deleteById(lateOpt.get().getId());
 				}
@@ -734,8 +730,7 @@ public class ApprovalFlowService {
 				// 通知成功
 				String msg = "您的補卡申請《" + request.getClockType().getTypeName() + "》已通過審核。";
 				notifyService.sendNotification(employee.getEmployeeId(), msg);
-					
-				
+
 			} else if (request.getClockType().getTypeName().equals("下班")) {
 				LocalDateTime startOfDay = missingDate.atStartOfDay();
 				LocalDateTime endOfDay = startOfDay.plusDays(1);
@@ -751,19 +746,19 @@ public class ApprovalFlowService {
 				log.setClockTime(missingDate.atTime(shiftType.getFinishTime()));
 				attendanceLogsRepository.save(log);
 
-				Optional<AttendanceViolations> earlyLeaveOpt = attendanceViolationsRepository.findByViolationType(
-						typeRepository.findByTypeName("早退").orElseThrow(() -> new RuntimeException("早退違規類型不存在")));
+				Optional<AttendanceViolations> earlyLeaveOpt = attendanceViolationsRepository
+						.findByAttendanceAndViolationType(attendance, typeRepository.findByTypeName("早退")
+								.orElseThrow(() -> new RuntimeException("早退違規類型不存在")));
 				if (earlyLeaveOpt.isPresent()) {
 					attendanceViolationsRepository.deleteById(earlyLeaveOpt.get().getId());
 				}
 				updateTotalHoursByClockCard(attendance, shiftType, clockOutTypeOpt.get());
-				
+
 				// 通知申請人審核通過
 				String msg = "您的補卡申請《" + request.getClockType().getTypeName() + "》已通過審核。";
 				notifyService.sendNotification(employee.getEmployeeId(), msg);
 			}
-			
-			
+
 			return "簽核成功";
 		}
 
@@ -806,12 +801,12 @@ public class ApprovalFlowService {
 			nextStep.setUpdatedAt(LocalDateTime.now());
 
 			approvalStepRepository.save(nextStep);
-			
-			//通知
-			 String notifyMsg = "您有一筆新的補卡申請待審核：員工 " +request.getEmployee().getEmployeeName() + " 的《" + request.getClockType().getTypeName() + "》補卡申請。";
-			 notifyService.sendNotification(nextApprover.getEmployeeId(), notifyMsg);
-					
-			
+
+			// 通知
+			String notifyMsg = "您有一筆新的補卡申請待審核：員工 " + request.getEmployee().getEmployeeName() + " 的《"
+					+ request.getClockType().getTypeName() + "》補卡申請。";
+			notifyService.sendNotification(nextApprover.getEmployeeId(), notifyMsg);
+
 		} else {
 			// 若沒有下一步，代表簽核完成，更新補卡單狀態
 			System.out.println("更新申請單");
@@ -843,13 +838,14 @@ public class ApprovalFlowService {
 				log.setClockType(clockInTypeOpt.orElseThrow(() -> new RuntimeException("上班打卡類型不存在")));
 				log.setClockTime(missingDate.atTime(shiftType.getStartTime()));
 				attendanceLogsRepository.save(log);
-				Optional<AttendanceViolations> lateOpt = attendanceViolationsRepository.findByViolationType(
-						typeRepository.findByTypeName("遲到").orElseThrow(() -> new RuntimeException("遲到違規類型不存在")));
+				Optional<AttendanceViolations> lateOpt = attendanceViolationsRepository
+						.findByAttendanceAndViolationType(attendance, typeRepository.findByTypeName("遲到")
+								.orElseThrow(() -> new RuntimeException("遲到違規類型不存在")));
 				if (lateOpt.isPresent()) {
 					attendanceViolationsRepository.deleteById(lateOpt.get().getId());
 				}
 				updateTotalHoursByClockCard(attendance, shiftType, clockInTypeOpt.get());
-				
+
 				// 通知成功
 				String msg = "您的補卡申請《" + request.getClockType().getTypeName() + "》已通過審核。";
 				notifyService.sendNotification(employee.getEmployeeId(), msg);
@@ -870,14 +866,14 @@ public class ApprovalFlowService {
 				log.setClockTime(missingDate.atTime(shiftType.getStartTime()));
 				attendanceLogsRepository.save(log);
 
-				Optional<AttendanceViolations> earlyLeaveOpt = attendanceViolationsRepository.findByViolationType(
-						typeRepository.findByTypeName("早退").orElseThrow(() -> new RuntimeException("早退違規類型不存在")));
+				Optional<AttendanceViolations> earlyLeaveOpt = attendanceViolationsRepository
+						.findByAttendanceAndViolationType(attendance, typeRepository.findByTypeName("早退")
+								.orElseThrow(() -> new RuntimeException("早退違規類型不存在")));
 				if (earlyLeaveOpt.isPresent()) {
 					attendanceViolationsRepository.deleteById(earlyLeaveOpt.get().getId());
 				}
 				updateTotalHoursByClockCard(attendance, shiftType, clockOutTypeOpt.get());
-				
-				
+
 				// 通知成功
 				String finalSuccessMsg = "您的補卡申請《" + request.getClockType().getTypeName() + "》已通過審核。";
 				notifyService.sendNotification(request.getEmployee().getEmployeeId(), finalSuccessMsg);
@@ -1001,8 +997,7 @@ public class ApprovalFlowService {
 			throw new RuntimeException("未找到對應的簽核流程");
 		}
 		ApprovalFlow firstStepFlow = firstStepFlowOpt.get();
-		
-		
+
 		// 找到該部門中符合該職位的第一位簽核人
 		Optional<Employee> approverOpt = employeeRepository
 				.findTopByPositionAndDepartmentAndStatus(firstStepFlow.getApproverPosition(),
@@ -1020,8 +1015,7 @@ public class ApprovalFlowService {
 
 		// 如果二次查詢仍然找不到簽核人，拋出異常
 		Employee approver = approverOpt.orElseThrow(() -> new RuntimeException("找不到該部門的簽核人，請確認設定"));
-		
-		
+
 		// 打印簽核人的姓名（可用於調試）
 		System.out.println(approver.getEmployeeName());
 
@@ -1039,10 +1033,10 @@ public class ApprovalFlowService {
 
 		// 儲存簽核步驟
 		approvalStepRepository.save(approvalStep);
-		
+
 		// 發送通知給第一位審核人
 		String employeeName = expenseRequest.getEmployee().getEmployeeName();
-		String typeName = expenseRequest.getExpenseType().getTypeName(); 
+		String typeName = expenseRequest.getExpenseType().getTypeName();
 		String message = "您有一筆新的費用申請待審核：員工 " + employeeName + " 的《" + typeName + "》申請單。";
 		notifyService.sendNotification(approver.getEmployeeId(), message);
 
@@ -1076,13 +1070,11 @@ public class ApprovalFlowService {
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 
 			expenseRequestRepository.save(request);
-			
-			
+
 			// 通知申請人
 			String failMsg = "您的費用申請《" + request.getExpenseType().getTypeName() + "》未通過審核。";
 			notifyService.sendNotification(request.getEmployee().getEmployeeId(), failMsg);
-			
-			
+
 			return "已否決請假單";
 		}
 
@@ -1099,12 +1091,11 @@ public class ApprovalFlowService {
 			request.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			expenseRequestRepository.save(request);
-			
+
 			// 通知申請人
 			String successMsg = "您的費用申請《" + request.getExpenseType().getTypeName() + "》已通過審核。";
 			notifyService.sendNotification(request.getEmployee().getEmployeeId(), successMsg);
 
-			
 			return "簽核成功";
 		}
 
@@ -1147,12 +1138,12 @@ public class ApprovalFlowService {
 			nextStep.setUpdatedAt(LocalDateTime.now());
 
 			approvalStepRepository.save(nextStep);
-			
+
 			// 通知下一位審核人
-			String notifyMsg = "您有一筆新的費用申請待審核：員工 " + request.getEmployee().getEmployeeName() + " 的《"+ request.getExpenseType().getTypeName() + "》申請單。";
+			String notifyMsg = "您有一筆新的費用申請待審核：員工 " + request.getEmployee().getEmployeeName() + " 的《"
+					+ request.getExpenseType().getTypeName() + "》申請單。";
 			notifyService.sendNotification(nextApprover.getEmployeeId(), notifyMsg);
-			
-			
+
 		} else {
 			// 若沒有下一步，代表簽核完成，更新費用單狀態
 			Integer requestId = step.getRequestId();
@@ -1161,18 +1152,16 @@ public class ApprovalFlowService {
 			request.setStatus(statusRepository.findByStatusNameAndStatusType("已核決", "表單狀態")
 					.orElseThrow(() -> new RuntimeException("狀態不存在")));
 			expenseRequestRepository.save(request);
-			
+
 			// 通知申請人
 			String successMsg = "您的費用申請《" + request.getExpenseType().getTypeName() + "》已通過審核。";
 			notifyService.sendNotification(request.getEmployee().getEmployeeId(), successMsg);
-					
+
 		}
 
 		return "簽核成功";
 	}
 
-
-	
 	// 查找全部簽核步驟1的簽核流程
 	@Transactional
 	public List<ApprovalFlowResponseDTO> getAllStepOneApprovalFlow() {
@@ -1269,10 +1258,25 @@ public class ApprovalFlowService {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到相關簽核流程");
 		}
 
-		// 確保這些步驟沒有正在使用的請假單
-		boolean isInUse = approvalStepRepository.existsByFlowIdIn(flowIdsToDelete);
+		Optional<ApprovalFlow> approvalFlowIdOpt = approvalFlowRepository.findById(flowId);
+		if (approvalFlowIdOpt.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("未找到相關簽核流程");
+		}
+
+		// 取該流程的 requestTypeCategory
+		String requestTypeCategory = approvalFlowIdOpt.get().getRequestType().getCategory();
+
+
+		// 取所有對應流程的 step，並從中找出 requestId
+		List<ApprovalStep> steps = approvalStepRepository.findByFlowIdIn(flowIdsToDelete);
+		List<Integer> requestIds = steps.stream().map(ApprovalStep::getRequestId).collect(Collectors.toList());
+
+
+
+		// 確保這些 requestId 不屬於「已核決」或「未核准」的申請
+		boolean isInUse = isRequestInPendingState(requestTypeCategory, requestIds);
 		if (isInUse) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("該流程已被請假單使用，無法刪除");
+			throw new RuntimeException("該流程有未核決的申請單，無法刪除");
 		}
 
 		approvalFlowRepository.deleteAllById(flowIdsToDelete);
@@ -1289,6 +1293,39 @@ public class ApprovalFlowService {
 			if (step.getNextStep() != null) {
 				collectNextSteps(step.getNextStep().getId(), flowIdsToDelete);
 			}
+		}
+
+	}
+
+	// 檢查 requestId 是否未核決
+	private boolean isRequestInPendingState(String requestType, List<Integer> requestIds) {
+		if (requestIds.isEmpty()) {
+			return false; // 沒有任何 requestId，代表流程未被使用
+		}
+
+		// 取 "已核決" 的 statusId
+		Integer approvedStatusId = statusRepository.findByStatusNameAndStatusType("已核決","表單狀態")
+				.orElseThrow(() -> new RuntimeException("無法找到 '已核決' 的狀態")).getStatusId();
+
+		// 取 "未核准" 的 statusId
+		Integer rejectedStatusId = statusRepository.findByStatusNameAndStatusType("未核准","表單狀態")
+				.orElseThrow(() -> new RuntimeException("無法找到 '未核准' 的狀態")).getStatusId();
+
+		switch (requestType) {
+		case "leave_type":
+			return leaveRequestRepository.existsByRequestIdsAndStatusNotIn(requestIds,
+					Arrays.asList(approvedStatusId, rejectedStatusId));
+		case "work_adjustment_type":
+			return adjustmentRequestRepository.existsByRequestIdsAndStatusNotIn(requestIds,
+					Arrays.asList(approvedStatusId, rejectedStatusId));
+		case "expense_type":
+			return expenseRequestRepository.existsByRequestIdsAndStatusNotIn(requestIds,
+					Arrays.asList(approvedStatusId, rejectedStatusId));
+		case "clock_type":
+			return missingPunchRequestRepository.existsByRequestIdsAndStatusNotIn(requestIds,
+					Arrays.asList(approvedStatusId, rejectedStatusId));
+		default:
+			return false; // 無效類型則不影響刪除
 		}
 	}
 }

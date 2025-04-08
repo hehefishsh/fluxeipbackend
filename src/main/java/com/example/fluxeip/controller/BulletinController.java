@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/bulletin")
-@CrossOrigin(origins = "https://fluxeipfrontend.onrender.com") // 允許 Vue 前端訪問
+@CrossOrigin(origins = "https://fluxeipfrontend.onrender.com/") // 允許 Vue 前端訪問
 public class BulletinController {
 
     @Autowired
