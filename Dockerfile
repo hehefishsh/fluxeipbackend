@@ -15,7 +15,7 @@ WORKDIR /app
 ARG PORT=8080
 ENV PORT=${PORT}
 
-# 从 build 阶段复制 jar 文件到 /app/app.jar
+# 從 build 階段複製 jar 文件到 /app/app.jar
 COPY --from=build /app/target/Fluxeip-0.0.1-SNAPSHOT.jar /app/app.jar
 
 EXPOSE 8080
